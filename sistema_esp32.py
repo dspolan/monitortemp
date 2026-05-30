@@ -6,7 +6,7 @@
 #
 #  Hardware:
 #    - PT100 + Puente de Wheatstone + AD620
-#    - Salida del AD620: 0 a 3.1 V  →  0 a 100 °C
+#    - Salida del AD620: 0 a 3.3 V  →  0 a 100 °C
 #    - Pin ADC: GPIO32 (ADC1, no interfiere con WiFi)
 #
 #  Flujo:
@@ -14,7 +14,7 @@
 #    2. Sincronizar hora real con NTP (internet)
 #    3. Leer ADC → convertir a temperatura
 #    4. Enviar { "temperatura": xx.x,
-#                "fecha": "2026-05-28",
+#                "fecha": "year-month-day",
 #                "hora": "14:35:22",
 #                "timestamp_ms": xxxxxx }
 #       a Firebase RTDB via HTTP PATCH
@@ -30,16 +30,16 @@ import utime
 from machine import ADC, Pin
 
 # ── Configuración WiFi ────────────────────────────
-WIFI_SSID     = 'Juancamiloperdomo'       # <-- Cambia aquí
-WIFI_PASSWORD = 'Juancamilo1208'  # <-- Cambia aquí
+WIFI_SSID     = 'red'       # <-- Cambia aquí
+WIFI_PASSWORD = 'clave'  # <-- Cambia aquí
 
 # ── Configuración Firebase ────────────────────────
-FIREBASE_URL = 'https://project-dc-pt100-default-rtdb.firebaseio.com/sensor.json'
+FIREBASE_URL = 'URL_firebase'
 
 # ── Configuración ADC ─────────────────────────────
 ADC_PIN    = 32
 ADC_MAX    = 4095   # Resolución 12 bits
-VOLT_MAX   = 3.3    # Voltaje máximo de salida del AD620 (RG=270Ω)
+VOLT_MAX   = 3.3    # Voltaje máximo de salida del AD620 (RG=283Ω)
 TEMP_MIN   = 0.0    # °C a 0 V
 TEMP_MAX   = 100.0  # °C a 3.3V
 
@@ -121,7 +121,7 @@ def leer_temperatura():
 def enviar_firebase(temperatura, fecha, hora, timestamp_ms):
     payload = ujson.dumps({
         'temperatura' : temperatura,
-        'fecha'       : fecha,       # "2026-05-28"
+        'fecha'       : fecha,       # "year-month-day"
         'hora'        : hora,        # "14:35:22"  (Colombia UTC-5, via NTP)
         'timestamp_ms': int(timestamp_ms)
     })
